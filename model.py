@@ -173,13 +173,14 @@ class Embedding(nn.Module):
         
         # input embedding stem
         self.time_emb = SineActivation(config.n_in, config.n_embd)
-        self.pos_emb = nn.Parameter(torch.zeros(1, config.block_size, config.n_embd))
+        # self.pos_emb = nn.Parameter(torch.zeros(1, config.block_size, config.n_embd))
         self.drop = nn.Dropout(config.embd_pdrop)
     
     def forward(self, x):
         time_embeddings = self.time_emb(x)                    # each value maps to a (learnable) vector
-        position_embeddings = self.pos_emb[:, :x.size(1), :]            # each position maps to a (learnable) vector
-        x = self.drop(time_embeddings + position_embeddings)   # broadcast for each batch (B, T, n_emb)
+        # position_embeddings = self.pos_emb[:, :x.size(1), :]            # each position maps to a (learnable) vector
+        # x = self.drop(time_embeddings + position_embeddings)   # broadcast for each batch (B, T, n_emb)
+        x = self.drop(time_embeddings)   # broadcast for each batch (B, T, n_emb)
 
         return x
 
@@ -277,8 +278,7 @@ class TAE(nn.Module):
             dec_in = layer(dec_in, enc_out)
         x = self.ln_f(dec_in)
         logits = self.head(x)   # (B, T, n_in)
-
         if targets is not None:
-            loss = F.mse_loss(logits.view(-1, logits.size(-1)), targets.view(-1))
+            loss = F.mse_loss(logits.view(-1, logits.size(-1)), targets.view(-1, logits.size(-1)))
 
         return logits, loss
