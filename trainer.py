@@ -75,7 +75,7 @@ class Trainer:
                 with torch.set_grad_enabled(is_train):
                     logits, loss = model(x, x, targets=y)
                     loss = loss.mean() # collapse all losses if they are scattered on multiple gpus
-                    # losses.append(loss.item())
+                    losses.append(loss.item())
 
                 if is_train:
 
@@ -108,14 +108,14 @@ class Trainer:
                     test_loss = float(np.mean(losses))
                     logger.info("test loss: %f", test_loss)
                     return test_loss
-            return losses
+            return sum(losses) / len(losses)
                 
         best_loss = float('inf')
         test_loss = float('inf')
         self.tokens = 0 # counter used for learning rate decay
         for epoch in range(config.max_epochs):
             
-            run_epoch('train')
+            self.losses.append(run_epoch('train'))
             if self.test_dataset is not None:
                 test_loss = run_epoch('test')
 

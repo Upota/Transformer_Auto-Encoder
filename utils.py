@@ -18,7 +18,7 @@ def top_k_logits(logits, k):
     return out
 
 @torch.no_grad()
-def sample(model, x, steps, temperature=1.0, sample=False, top_k=None):
+def sample(model, x, steps=None, temperature=1.0, sample=False, top_k=None):
     """
     take a conditioning sequence of indeices in x (of shape (b, t)) and predict the next token in
     the sequence, feeding the predictions back into the model each time, Clearly the sampling
