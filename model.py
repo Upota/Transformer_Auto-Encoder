@@ -281,4 +281,4 @@ class TAE(nn.Module):
         if targets is not None:
             loss = F.mse_loss(logits.view(-1, logits.size(-1)), targets.view(-1, logits.size(-1)))
 
-        return logits, loss
+        return logits, loss if targets is not None else None

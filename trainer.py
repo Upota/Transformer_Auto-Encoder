@@ -37,7 +37,8 @@ class Trainer:
         self.train_dataset = train_dataset
         self.test_dataset = test_dataset
         self.config = config
-        self.losses = []
+        self.train_losses = []
+        self.validation_losses = []
         # take over whatever gpus are on the system
         self.device = 'cpu'
         if torch.cuda.is_available():
@@ -108,16 +109,17 @@ class Trainer:
                     test_loss = float(np.mean(losses))
                     logger.info("test loss: %f", test_loss)
                     return test_loss
-            return sum(losses) / len(losses)
+            return float(np.mean(losses))
                 
         best_loss = float('inf')
         test_loss = float('inf')
-        self.tokens = 0 # counter used for learning rate decay
+        # self.tokens = 0 # counter used for learning rate decay
         for epoch in range(config.max_epochs):
             
-            self.losses.append(run_epoch('train'))
+            self.train_losses.append(run_epoch('train'))
             if self.test_dataset is not None:
                 test_loss = run_epoch('test')
+                self.validation_losses.append(test_loss)
 
             # supports early stopping based on the test loss, or just save always if no test set is provided
             good_model = self.test_dataset is None or test_loss < best_loss

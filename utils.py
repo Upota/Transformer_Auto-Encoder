@@ -18,7 +18,7 @@ def top_k_logits(logits, k):
     return out
 
 @torch.no_grad()
-def sample(model, x, steps=None, temperature=1.0, sample=False, top_k=None):
+def sample(model, x, steps, temperature=1.0, sample=False):
     """
     take a conditioning sequence of indeices in x (of shape (b, t)) and predict the next token in
     the sequence, feeding the predictions back into the model each time, Clearly the sampling
@@ -27,12 +27,10 @@ def sample(model, x, steps=None, temperature=1.0, sample=False, top_k=None):
     """
     block_size = model.get_block_size()
     model.eval()
-    # for k in range(steps):
-    #     x_cond = x if x.size(1) <= block_size else x[:, -block_size:] # crop contest if needed
-    #     logits, _ = model(x_cond, x_cond, targets=x_cond)
-    #     x = torch.cat((x, logits), dim=1)
-    
-    x_cond = x if x.size(1) <= block_size else x[:, -block_size:] # crop contest if needed
-    logits, _ = model(x_cond, x_cond, targets=x_cond)
+    for k in range(steps):
+        x_cond = x if x.size(1) <= block_size else x[:, -block_size:] # crop contest if needed
+        logits, _ = model(x_cond, x_cond)
+        logits = logits[:, -1, :]
+        x = torch.cat((x, logits), dim=1)
 
-    return logits
+    return x
