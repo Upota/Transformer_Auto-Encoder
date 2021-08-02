@@ -10,6 +10,6 @@ Succeeded in implementing a supervised transformer denoising auto-encoder.
 ## Things To Improve
 * Looking for ways to develop into an unsupervised learning model.  
 * Reasonable performance metrics should be introduced.  
-* Need to improving performance.  
+* Experiments should be conducted on more complex time series signals.  
   
 __Improvements are ongoing.__
